@@ -1,2 +1,0 @@
-.pageWrapper{background-color:#f2f3f7;min-height:100vh;min-width:100vw}.centered{width:100%;display:flex;justify-content:center}.products-grid{width:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:450px}.card{transition:box-shadow .3s}.card:hover{box-shadow:0 0 11px rgba(0,0,0,.5)}.product-price{color:#6a6d73}
-/*# sourceMappingURL=main.eb2fd41d.chunk.css.map */
