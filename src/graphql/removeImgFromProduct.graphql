@@ -1,0 +1,3 @@
+mutation removeImgFromProduct($img_id: Float!) {
+    removeImgFromProduct(img_id: $img_id)
+}

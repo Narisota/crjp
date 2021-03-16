@@ -1,0 +1,3 @@
+mutation deleteCoupon($coupon_name: String!) {
+    deleteCoupon(coupon_name: $coupon_name)
+}

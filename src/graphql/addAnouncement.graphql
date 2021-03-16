@@ -1,0 +1,3 @@
+mutation addAnnouncement($text: String!) {
+    addAnnouncement(text: $text)
+}

@@ -1,0 +1,15 @@
+mutation updateProduct(
+    $product_id: Float!
+    $name: String!
+    $desc: String!
+    $price: Float!
+    $stock: Float!
+) {
+    updateProduct(
+        product_id: $product_id
+        name: $name
+        desc: $desc
+        price: $price
+        stock: $stock
+    )
+}

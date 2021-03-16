@@ -1,0 +1,3 @@
+mutation deleteAnnouncement($id: String!) {
+    deleteAnnouncement(id: $id)
+}

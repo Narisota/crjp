@@ -1,0 +1,7 @@
+query getSections {
+    getSections {
+        section_id
+        name
+        thumbnail
+    }
+}

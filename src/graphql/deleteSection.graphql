@@ -1,0 +1,3 @@
+mutation deleteSection($section_id: Float!) {
+    deleteSection(section_id: $section_id)
+}

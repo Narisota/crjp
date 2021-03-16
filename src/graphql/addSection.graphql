@@ -1,0 +1,3 @@
+mutation addSection($name: String!, $thumbnail: String!) {
+    addSection(name: $name, thumbnail: $thumbnail)
+}

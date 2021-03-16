@@ -1,0 +1,27 @@
+query getOrderById($order_id: Float!) {
+    getOrderById(order_id: $order_id) {
+        products {
+            product_id
+            name
+            desc
+            price
+            stock
+            exp_date
+            quantityOrdered
+            productSubtotal
+            images {
+                img_id
+                img_url
+                index
+            }
+        }
+        order_id
+        tracking_num
+        shipping
+        warning
+        order_total
+        coupon
+        discount
+        date_of_purchase
+    }
+}

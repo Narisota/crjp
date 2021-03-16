@@ -1,0 +1,7 @@
+query getCoupons {
+    getCoupons {
+        coupon_name
+        coupon_id
+        discount
+    }
+}

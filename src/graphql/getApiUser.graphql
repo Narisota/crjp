@@ -1,0 +1,6 @@
+query getApiUsers {
+    getApiUsers {
+        uuid
+        username
+    }
+}

@@ -1,0 +1,3 @@
+mutation addProductToSection($product_id: Float!, $section_id: Float!) {
+    addProductToSection(product_id: $product_id, section_id: $section_id)
+}

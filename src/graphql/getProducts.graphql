@@ -1,0 +1,14 @@
+query getProducts {
+    getProducts {
+        product_id
+        name
+        desc
+        price
+        stock
+        exp_date
+        images {
+            img_id
+            img_url
+        }
+    }
+}

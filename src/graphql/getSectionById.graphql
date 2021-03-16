@@ -1,0 +1,7 @@
+query getSectionById($section_id: Float!) {
+    getSectionById(section_id: $section_id) {
+        section_id
+        thumbnail
+        name
+    }
+}

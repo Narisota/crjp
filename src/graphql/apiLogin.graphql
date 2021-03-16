@@ -1,0 +1,6 @@
+mutation apiLogin($username: String!, $password: String!) {
+    apiLogin(username: $username, password: $password) {
+        accessToken
+        refreshToken
+    }
+}

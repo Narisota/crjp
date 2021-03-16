@@ -1,0 +1,3 @@
+mutation updateSocialUrl($url: String!, $id: Float!) {
+    updateSocialUrl(url: $url, id: $id)
+}

@@ -1,0 +1,3 @@
+mutation addApiUser($username: String!, $password: String!) {
+    addApiUser(username: $username, password: $password)
+}

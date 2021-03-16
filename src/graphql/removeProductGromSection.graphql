@@ -1,0 +1,3 @@
+mutation removeProductFromSection($product_id: Float!, $section_id: Float!) {
+    removeProductFromSection(product_id: $product_id, section_id: $section_id)
+}

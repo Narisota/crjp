@@ -1,0 +1,9 @@
+query getSocials($component: String!) {
+    getSocials(component: $component) {
+        id
+        index
+        social_url
+        social_logo
+        display
+    }
+}

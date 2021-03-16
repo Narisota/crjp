@@ -1,0 +1,7 @@
+query getProductsSections($product_id: Float!) {
+    getProductsSections(product_id: $product_id) {
+        section_id
+        name
+        thumbnail
+    }
+}

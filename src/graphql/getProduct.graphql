@@ -1,0 +1,14 @@
+query getProduct($product_id: Float!) {
+    getProduct(product_id: $product_id) {
+        product_id
+        name
+        desc
+        price
+        stock
+        exp_date
+        images {
+            img_id
+            img_url
+        }
+    }
+}

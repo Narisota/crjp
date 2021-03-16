@@ -1,0 +1,3 @@
+mutation deleteApiUser($uuid: Float!) {
+    deleteApiUser(uuid: $uuid)
+}

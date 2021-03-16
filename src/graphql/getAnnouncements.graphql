@@ -1,0 +1,6 @@
+query getAnnouncements {
+    getAnnouncements {
+        id
+        text
+    }
+}

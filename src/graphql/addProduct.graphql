@@ -1,0 +1,8 @@
+mutation addProduct(
+    $name: String!
+    $desc: String!
+    $price: Float!
+    $stock: Float!
+) {
+    addProduct(name: $name, desc: $desc, price: $price, stock: $stock)
+}

@@ -1,0 +1,3 @@
+mutation addCoupon($coupon_name: String!, $discount: String!) {
+    addCoupon(coupon_name: $coupon_name, discount: $discount)
+}

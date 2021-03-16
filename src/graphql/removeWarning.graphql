@@ -1,0 +1,3 @@
+mutation removeWarning($order_id: Float!) {
+    removeWarning(order_id: $order_id)
+}

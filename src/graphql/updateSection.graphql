@@ -1,0 +1,7 @@
+mutation updateSection(
+    $name: String!
+    $thumbnail: String!
+    $section_id: Float!
+) {
+    updateSection(name: $name, thumbnail: $thumbnail, section_id: $section_id)
+}
