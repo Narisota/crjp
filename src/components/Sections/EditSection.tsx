@@ -42,7 +42,7 @@ const EditSection = () => {
     const replaceImage = async (file: any) => {
         const form = new FormData();
 
-        form.append("api_key", "767632178961832"); //get api key from cloudinary
+        form.append("api_key", "767632178961832"); //get api key from cloudinar
 
         form.append("file", file);
         form.append("tags", `codeinfuse, medium, gist`);
