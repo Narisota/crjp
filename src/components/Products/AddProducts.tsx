@@ -19,8 +19,8 @@ const AddProducts = () => {
     const [redirect, setRedirect] = useState(false);
 
     const handleSubmit = async () => {
-        if (!name || !desc || !price || !stock) {
-            inputValidation(name, desc, price, stock);
+        if (!name || !desc || !price || !stock || !image_urls[0]) {
+            inputValidation(name, desc, price, stock, image_urls);
         } else {
             try {
                 let product_id = await addProduct({
@@ -217,7 +217,13 @@ const AddProducts = () => {
 };
 export default AddProducts;
 
-const inputValidation = (name: any, desc: any, price: any, stock: any) => {
+const inputValidation = (
+    name: any,
+    desc: any,
+    price: any,
+    stock: any,
+    image_urls: any
+) => {
     let ids = ["name", "desc", "price", "stock"],
         doc = document;
 
@@ -238,5 +244,9 @@ const inputValidation = (name: any, desc: any, price: any, stock: any) => {
     }
     if (!stock) {
         doc.getElementById("stock")!.classList.add("invalid");
+    }
+
+    if (!image_urls[0]) {
+        M.toast({ html: "Please add an image to continue" });
     }
 };
