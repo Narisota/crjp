@@ -189,7 +189,20 @@ const EditProduct = () => {
             for (let i = 0; i < files.length; i++) {
                 const form = new FormData();
 
-                form.append("api_key", "767632178961832"); //get api key from cloudinary
+                if (!process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
+                    M.toast({ html: "env err" });
+                    return;
+                }
+
+                if (!process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
+                    M.toast({ html: "env err" });
+                    return;
+                }
+
+                form.append(
+                    "api_key",
+                    `${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}`
+                ); //get api key from cloudinary
 
                 form.append("file", files[i]);
                 form.append("tags", `codeinfuse, medium, gist`);
@@ -200,7 +213,7 @@ const EditProduct = () => {
                 // "https://api.cloudinary.com/v1_1/CLOUD_NAME/image/upload"
                 try {
                     let res = await Axios.post(
-                        "https://api.cloudinary.com/v1_1/desimqzzy/image/upload",
+                        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
                         form,
                         {
                             headers: {
