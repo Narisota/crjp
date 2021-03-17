@@ -32,6 +32,10 @@ const AddSection = () => {
                 setRedirect(true);
             }
         }
+
+        if (document.getElementById("submit-btn")) {
+            document.getElementById("submit-btn")!.classList.remove("disabled");
+        }
     };
 
     const addImage = async (file: any) => {

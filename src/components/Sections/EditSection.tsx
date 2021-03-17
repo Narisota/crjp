@@ -55,7 +55,7 @@ const EditSection = () => {
         form.append(
             "api_key",
             `${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}`
-        ); //get api key from cloudinar
+        ); //get api key from cloudinary
 
         form.append("file", file);
         form.append("tags", `codeinfuse, medium, gist`);
