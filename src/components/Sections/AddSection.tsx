@@ -15,7 +15,7 @@ const AddSection = () => {
             if (!name) {
                 M.toast({ html: "Please add a Section name" });
             }
-            if (imgUrl) {
+            if (!imgUrl) {
                 M.toast({ html: "Please add a img" });
             }
         } else {
