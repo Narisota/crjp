@@ -328,8 +328,9 @@ const EditProduct = () => {
             </div>
             <form>
                 <div className="row">
-                    <div className="input-field">
+                    <div className="input-field product-input">
                         <input
+                            className="browser-default"
                             id="name"
                             type="text"
                             value={name}
@@ -344,11 +345,11 @@ const EditProduct = () => {
                 </div>
 
                 <div className="row">
-                    <div className="input-field">
+                    <div className="input-field product-input">
                         <textarea
+                            className="browser-default materialize-textarea"
                             id="desc"
                             value={desc}
-                            className="materialize-textarea"
                             onChange={e => setDesc(e.target.value)}
                         />
                         <label htmlFor="desc">{product.desc}</label>
@@ -356,8 +357,9 @@ const EditProduct = () => {
                 </div>
 
                 <div className="row">
-                    <div className="input-field">
+                    <div className="input-field product-input">
                         <input
+                            className="browser-default"
                             id="price"
                             type="text"
                             value={price}
@@ -377,8 +379,9 @@ const EditProduct = () => {
                 </div>
 
                 <div className="row">
-                    <div className="input-field">
+                    <div className="input-field product-input">
                         <input
+                            className="browser-default"
                             id="stock"
                             type="text"
                             value={stock}
@@ -399,16 +402,9 @@ const EditProduct = () => {
 
                 <div className="row">
                     <div className="chips chips-initial" id="chips-initial">
+                        <span>Sections: </span>
                         <input className="custom-class" />
                     </div>
-                    {/* <div className="input-field">
-                        <input
-                            id="categories"
-                            className="autocomplete"
-                            type="text"
-                        />
-                        <label htmlFor="categories">Sections</label>
-                    </div> */}
                 </div>
 
                 <div
