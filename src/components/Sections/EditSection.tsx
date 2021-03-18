@@ -42,20 +42,15 @@ const EditSection = () => {
     const replaceImage = async (file: any) => {
         const form = new FormData();
 
-        if (!process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
+        if (
+            !process.env.REACT_APP_CLOUDINARY_CLOUD_NAME ||
+            !process.env.REACT_APP_CLOUDINARY_API_KEY
+        ) {
             M.toast({ html: "env err" });
             return;
         }
 
-        if (!process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
-            M.toast({ html: "env err" });
-            return;
-        }
-
-        form.append(
-            "api_key",
-            `${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}`
-        ); //get api key from cloudinary
+        form.append("api_key", `${process.env.REACT_APP_CLOUDINARY_API_KEY}`); //get api key from cloudinary
 
         form.append("file", file);
         form.append("tags", `codeinfuse, medium, gist`);

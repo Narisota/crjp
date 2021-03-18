@@ -55,19 +55,17 @@ const AddProducts = () => {
             for (let i = 0; i < files.length; i++) {
                 const form = new FormData();
 
-                if (!process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
-                    M.toast({ html: "env err" });
-                    return;
-                }
-
-                if (!process.env.REACT_APP_CLOUDINARY_CLOUD_NAME) {
+                if (
+                    !process.env.REACT_APP_CLOUDINARY_CLOUD_NAME ||
+                    !process.env.REACT_APP_CLOUDINARY_API_KEY
+                ) {
                     M.toast({ html: "env err" });
                     return;
                 }
 
                 form.append(
                     "api_key",
-                    `${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}`
+                    `${process.env.REACT_APP_CLOUDINARY_API_KEY}`
                 ); //get api key from cloudinary
 
                 form.append("file", files[i]);
