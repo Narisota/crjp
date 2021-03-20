@@ -54,8 +54,6 @@ const GetProductsOptions = () => {
     };
 };
 
-const finalSpaceCharacters = [];
-
 const EditProduct = () => {
     var product_id = GetProductId();
     const {
@@ -80,8 +78,15 @@ const EditProduct = () => {
     const [sections, setSections] = useState([{}] as any[]);
     const [removedSections, setRemovedSections] = useState([] as number[]);
 
-    const [optionValues, setOptionValues] = useState([{}] as any[]);
-    const [options, updateOptions] = useState(finalSpaceCharacters as any);
+    const [optionValues, setOptionValues] = useState([
+        {
+            id: "",
+            name: "",
+            init: true,
+            price: "",
+        },
+    ] as any[]);
+    const [options, updateOptions] = useState([] as any);
 
     const { sdata, sloading } = GetSections();
     const { pdata, ploading } = GetProductsSections();
@@ -164,7 +169,42 @@ const EditProduct = () => {
         let autoCompleteData: any = {},
             initialChips = [] as any[];
 
-        if (!sloading && !!sdata && !ploading && !!pdata && !oloading) {
+        if (
+            !sloading &&
+            !!sdata &&
+            !ploading &&
+            !!pdata &&
+            !oloading &&
+            !!odata
+        ) {
+            if (optionValues[0].init) {
+                let values = [{}];
+                let options = [{}];
+
+                if (odata.getProductsOptions.length === 0) {
+                } else {
+                    for (let i = 0; i < odata.getProductsOptions.length; i++) {
+                        let opt = odata.getProductsOptions[i];
+
+                        values[i] = {
+                            name: ``,
+                            price: ``,
+                            stock: ``,
+                        };
+
+                        options[i] = {
+                            id: `${opt.option_id}`,
+                            name: `${opt.name}`,
+                            price: `${opt.price}`,
+                            stock: `${opt.stock}`,
+                            opt_index: opt.index,
+                        };
+                    }
+                    updateOptions(options);
+                    setOptionValues(values);
+                }
+            }
+
             sdata.getSections.forEach((_val, i) => {
                 autoCompleteData[`${sdata?.getSections[i].name}`] = null;
             });
@@ -208,8 +248,6 @@ const EditProduct = () => {
     if (loading || sloading || ploading || oloading) {
         return <>...loading</>;
     }
-
-    console.log("odata :>> ", odata);
 
     if (error) {
         return <Redirect to="/products" />;
@@ -356,37 +394,61 @@ const EditProduct = () => {
     };
 
     const addOptionsToProduct = async () => {
-        console.log("test");
         // get indexes though dom
         let ul = document.getElementById("options-DD")!;
 
         //create options array to pass into mutation
-        let options = [{ name: "", price: -1, stock: "", index: -1 }];
+        let options = [{}] as any[];
 
         for (let i = 0; i < ul.children.length; i++) {
             let name: any = document.getElementById(`name-${i}`)!;
             let price: any = document.getElementById(`price-${i}`)!;
             let stock: any = document.getElementById(`stock-${i}`);
-            options[i] = {
-                name: name.value,
-                price: price.value,
-                stock: stock.value,
-                index: i,
-            };
+
+            console.log("name.label :>> ", name.labels[0].innerHTML);
+            if (name.labels[0].innerHTML.toLowerCase() === "option") {
+                if (!name.value || !stock.value) {
+                    M.toast({ html: "please add missing values" });
+                    return;
+                }
+                let tmp = price.value;
+                if (!tmp) {
+                    tmp = data?.apiGetProduct.price;
+                }
+
+                options.unshift({
+                    name: name.value,
+                    price: Number(tmp),
+                    stock: Number(stock.value),
+                    index: i,
+                });
+            }
         }
 
-        let options_str = JSON.stringify(options);
+        if (ul.children.length !== odata?.getProductsOptions.length) {
+            for (let i = 0; i < options.length; i++) {
+                if (!options[i].name) {
+                    options.splice(i, 1);
+                }
+            }
 
-        let res = await ADD_OPT_TO_PRODUCT({
-            variables: {
-                options_str,
-                product_id,
-            },
-        });
+            let options_str = JSON.stringify(options);
 
-        console.log("res :>> ", res);
+            let res = await ADD_OPT_TO_PRODUCT({
+                variables: {
+                    options_str,
+                    product_id,
+                },
+            });
 
-        console.log(`options`, options);
+            if (res.data?.addOptionToProduct) {
+                window.location.reload();
+            } else {
+                M.toast({ html: "An Error has occured" });
+                M.toast({ html: "Please try refreshing the page" });
+                M.toast({ html: "If error persist check heroku logs" });
+            }
+        }
     };
 
     let product = data!.apiGetProduct;
@@ -513,13 +575,13 @@ const EditProduct = () => {
                                     >
                                         {options.map(
                                             (
-                                                { id, name, price },
+                                                { id, name, price, stock },
                                                 index: any
                                             ) => {
                                                 return (
                                                     <Draggable
-                                                        key={id}
-                                                        draggableId={id}
+                                                        key={`${id}`}
+                                                        draggableId={`${id}`}
                                                         index={index}
                                                     >
                                                         {prov => (
@@ -547,7 +609,7 @@ const EditProduct = () => {
                                                                     }}
                                                                     className="row"
                                                                 >
-                                                                    <div className="col s6 noselect">
+                                                                    <div className="col s5 noselect">
                                                                         <div className="input-field product-input">
                                                                             <input
                                                                                 className="browser-default"
@@ -649,7 +711,7 @@ const EditProduct = () => {
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="col s2 noselect">
+                                                                    <div className="col s3 noselect">
                                                                         <div className="input-field product-input">
                                                                             <input
                                                                                 className="browser-default"
@@ -681,13 +743,31 @@ const EditProduct = () => {
                                                                             <label
                                                                                 htmlFor={`stock-${index}`}
                                                                             >
-                                                                                STOCK
+                                                                                {stock ? (
+                                                                                    <>
+                                                                                        STOCK
+                                                                                        =&gt;{" "}
+                                                                                        {
+                                                                                            stock
+                                                                                        }
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        STOCK
+                                                                                    </>
+                                                                                )}
                                                                             </label>
                                                                         </div>
                                                                     </div>
 
                                                                     <i className="material-icons noselect">
                                                                         drag_handle
+                                                                    </i>
+                                                                    <i
+                                                                        className="material-icons red-text noselect"
+                                                                        onClick={() => {}}
+                                                                    >
+                                                                        delete
                                                                     </i>
                                                                 </div>
                                                             </li>
@@ -706,26 +786,36 @@ const EditProduct = () => {
                             className="add-option"
                             onClick={() => {
                                 //updated state
-                                let tmp = options;
+                                let q = options;
+                                let tmp = q;
                                 tmp.push({
-                                    id: `opt-${Math.random() * (100 - 5) + 5}`,
+                                    id: `opt-${Number(
+                                        Math.random() * (100 - 5) + 5
+                                    ).toFixed(2)}`,
                                     name: "Option",
-                                    price: "599",
+                                    price: data?.apiGetProduct.price,
                                 });
+
                                 updateOptions(tmp);
-                                tmp = optionValues;
+
+                                q = optionValues;
+                                tmp = q;
+
                                 //space to prevent if from firing after first time
                                 tmp.push({
-                                    name: " ",
+                                    name: "",
                                     price: "",
                                     stock: "",
                                 });
 
                                 //remove init value
-                                if (!tmp[0].name) {
+                                if (tmp[0].init) {
                                     tmp.splice(0, 1);
                                 }
+
                                 setOptionValues(tmp);
+
+                                console.log("refresh :>> ", refresh);
                                 setRefresh(!refresh);
                             }}
                         >
