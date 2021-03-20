@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 import {
-    useAddImgToProductMutation,
-    useAddProductToSectionMutation,
-    useDeleteProductMutation,
-    useGetProductQuery,
     useGetSectionsQuery,
-    useRemoveImgFromProductMutation,
-    useUpdateProductMutation,
+    useApiGetProductQuery,
+    useGetProductsOptionsQuery,
     useGetProductsSectionsQuery,
-    useRemoveProductFromSectionMutation,
 } from "../../generated/graphql";
 import Dropzone from "react-dropzone";
 import { Redirect } from "react-router-dom";
 import Axios from "axios";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { GetProductId } from "./GetProductId";
+import ProductsMutations from "./ProductsMutations";
 
 const GetSections = () => {
     const { data, loading } = useGetSectionsQuery();
@@ -23,13 +21,7 @@ const GetSections = () => {
 };
 
 const GetProductsSections = () => {
-    var product_id = -1;
-
-    if (process.env.NODE_ENV === "production") {
-        product_id = Number(window.location.href.split(":")[2]);
-    } else {
-        product_id = Number(window.location.href.split(":")[3]);
-    }
+    var product_id = GetProductId();
     const { data, loading } = useGetProductsSectionsQuery({
         variables: {
             product_id,
@@ -45,38 +37,78 @@ const GetProductsSections = () => {
     };
 };
 
-const EditProduct = () => {
-    var product_id = -1;
-
-    if (process.env.NODE_ENV === "production") {
-        product_id = Number(window.location.href.split(":")[2]);
-    } else {
-        product_id = Number(window.location.href.split(":")[3]);
-    }
-
-    const { sdata, sloading } = GetSections();
-    const { pdata, ploading } = GetProductsSections();
-    const { data, loading, error } = useGetProductQuery({
+const GetProductsOptions = () => {
+    var product_id = GetProductId();
+    const { data, loading } = useGetProductsOptionsQuery({
         variables: {
             product_id,
         },
     });
 
-    const [addProductToSection] = useAddProductToSectionMutation();
-    const [removeProductFromSection] = useRemoveProductFromSectionMutation();
-    const [updateProduct] = useUpdateProductMutation();
-    const [deleteProduct] = useDeleteProductMutation();
-    const [addImgToProduct] = useAddImgToProductMutation();
-    const [deleteImg] = useRemoveImgFromProductMutation();
+    let odata = data,
+        oloading = loading;
+
+    return {
+        odata,
+        oloading,
+    };
+};
+
+const finalSpaceCharacters = [];
+
+const EditProduct = () => {
+    var product_id = GetProductId();
+    const {
+        addProductToSection,
+        removeProductFromSection,
+        updateProduct,
+        deleteProduct,
+        addImgToProduct,
+        deleteImg,
+        ADD_OPT_TO_PRODUCT,
+        toggleDisplay,
+    } = ProductsMutations();
+
+    const [refresh, setRefresh] = useState(false);
     const [name, setName] = useState("");
     const [desc, setDesc] = useState("");
     const [price, setPrice] = useState(""); //price in cents
     const [stock, setStock] = useState("");
     const [image_urls, setImage_urls] = useState([]);
     const [image_ids, setImage_ids] = useState([]);
-    const [refresh, setRefresh] = useState(false);
+
     const [sections, setSections] = useState([{}] as any[]);
     const [removedSections, setRemovedSections] = useState([] as number[]);
+
+    const [optionValues, setOptionValues] = useState([{}] as any[]);
+    const [options, updateOptions] = useState(finalSpaceCharacters as any);
+
+    const { sdata, sloading } = GetSections();
+    const { pdata, ploading } = GetProductsSections();
+    const { odata, oloading } = GetProductsOptions();
+    const { data, loading, error } = useApiGetProductQuery({
+        variables: {
+            product_id,
+        },
+    });
+
+    function handleOnDragEnd(result: any) {
+        if (!result.destination) return;
+
+        const items = Array.from(options);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        updateOptions(items);
+
+        //reorder values state
+        let values = optionValues;
+
+        const [reorderedValue] = values.splice(result.source.index, 1);
+        values.splice(result.destination.index, 0, reorderedValue);
+
+        setOptionValues(values);
+    }
 
     const onChipDeleteCB = (_e: any, i: any) => {
         console.log("deleted");
@@ -132,7 +164,7 @@ const EditProduct = () => {
         let autoCompleteData: any = {},
             initialChips = [] as any[];
 
-        if (!sloading && !!sdata && !ploading && !!pdata) {
+        if (!sloading && !!sdata && !ploading && !!pdata && !oloading) {
             sdata.getSections.forEach((_val, i) => {
                 autoCompleteData[`${sdata?.getSections[i].name}`] = null;
             });
@@ -173,9 +205,11 @@ const EditProduct = () => {
         }
     });
 
-    if (loading || sloading || ploading) {
+    if (loading || sloading || ploading || oloading) {
         return <>...loading</>;
     }
+
+    console.log("odata :>> ", odata);
 
     if (error) {
         return <Redirect to="/products" />;
@@ -290,7 +324,7 @@ const EditProduct = () => {
                 await addImgToProduct({
                     variables: {
                         img_url: image_urls[i],
-                        product_id: data?.getProduct.product_id!,
+                        product_id: data?.apiGetProduct.product_id!,
                     },
                 });
             } catch (err) {
@@ -316,15 +350,64 @@ const EditProduct = () => {
             }
         }
 
+        // add options
+
         window.location.reload();
     };
 
-    let product = data!.getProduct;
+    const addOptionsToProduct = async () => {
+        console.log("test");
+        // get indexes though dom
+        let ul = document.getElementById("options-DD")!;
+
+        //create options array to pass into mutation
+        let options = [{ name: "", price: -1, stock: "", index: -1 }];
+
+        for (let i = 0; i < ul.children.length; i++) {
+            let name: any = document.getElementById(`name-${i}`)!;
+            let price: any = document.getElementById(`price-${i}`)!;
+            let stock: any = document.getElementById(`stock-${i}`);
+            options[i] = {
+                name: name.value,
+                price: price.value,
+                stock: stock.value,
+                index: i,
+            };
+        }
+
+        let options_str = JSON.stringify(options);
+
+        let res = await ADD_OPT_TO_PRODUCT({
+            variables: {
+                options_str,
+                product_id,
+            },
+        });
+
+        console.log("res :>> ", res);
+
+        console.log(`options`, options);
+    };
+
+    let product = data!.apiGetProduct;
 
     return (
         <div className="container" style={{ width: "50%" }}>
             <div className="row">
                 <h5>Edit Product</h5>
+                <h5
+                    className="right"
+                    onClick={async () => {
+                        await toggleDisplay({ variables: { product_id } });
+                        window.location.reload();
+                    }}
+                >
+                    {data?.apiGetProduct.hidden ? (
+                        <>Status: Hidden</>
+                    ) : (
+                        <>Status: Shown</>
+                    )}
+                </h5>
             </div>
             <form>
                 <div className="row">
@@ -407,6 +490,254 @@ const EditProduct = () => {
                     </div>
                 </div>
 
+                <div className="row">
+                    <div className="container">
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <span>Option</span>
+                            <span>Price</span>
+                        </div>
+
+                        <DragDropContext onDragEnd={handleOnDragEnd}>
+                            <Droppable droppableId="characters">
+                                {provided => (
+                                    <ul
+                                        className="characters"
+                                        id="options-DD"
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                    >
+                                        {options.map(
+                                            (
+                                                { id, name, price },
+                                                index: any
+                                            ) => {
+                                                return (
+                                                    <Draggable
+                                                        key={id}
+                                                        draggableId={id}
+                                                        index={index}
+                                                    >
+                                                        {prov => (
+                                                            <li
+                                                                ref={
+                                                                    prov.innerRef
+                                                                }
+                                                                {...prov.draggableProps}
+                                                                {...prov.dragHandleProps}
+                                                            >
+                                                                <div
+                                                                    style={{
+                                                                        width:
+                                                                            "100%",
+                                                                        display:
+                                                                            "flex",
+                                                                        justifyContent:
+                                                                            "space-between",
+                                                                        backgroundColor:
+                                                                            "white",
+
+                                                                        margin: 0,
+                                                                        borderBottom:
+                                                                            "1px solid #f2f3f7",
+                                                                    }}
+                                                                    className="row"
+                                                                >
+                                                                    <div className="col s6 noselect">
+                                                                        <div className="input-field product-input">
+                                                                            <input
+                                                                                className="browser-default"
+                                                                                id={`name-${index}`}
+                                                                                type="text"
+                                                                                value={
+                                                                                    !optionValues[
+                                                                                        index
+                                                                                    ]
+                                                                                        ? ""
+                                                                                        : optionValues[
+                                                                                              index
+                                                                                          ]
+                                                                                              .name
+                                                                                }
+                                                                                onChange={e => {
+                                                                                    if (
+                                                                                        e.target.value.match(
+                                                                                            /^ /
+                                                                                        )
+                                                                                    ) {
+                                                                                        let tmp = optionValues;
+                                                                                        tmp[
+                                                                                            index
+                                                                                        ].name = e.target.value.substring(
+                                                                                            1
+                                                                                        );
+
+                                                                                        setOptionValues(
+                                                                                            tmp
+                                                                                        );
+                                                                                        setRefresh(
+                                                                                            !refresh
+                                                                                        );
+                                                                                    } else {
+                                                                                        let tmp = optionValues;
+                                                                                        tmp[
+                                                                                            index
+                                                                                        ].name =
+                                                                                            e.target.value;
+
+                                                                                        setOptionValues(
+                                                                                            tmp
+                                                                                        );
+                                                                                        setRefresh(
+                                                                                            !refresh
+                                                                                        );
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                            <label
+                                                                                htmlFor={`name-${index}`}
+                                                                            >
+                                                                                {
+                                                                                    name
+                                                                                }
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col s2 offset-s1 noselect">
+                                                                        <div className="input-field product-input">
+                                                                            <input
+                                                                                className="browser-default"
+                                                                                id={`price-${index}`}
+                                                                                type="text"
+                                                                                value={
+                                                                                    !optionValues[
+                                                                                        index
+                                                                                    ]
+                                                                                        ? ""
+                                                                                        : optionValues[
+                                                                                              index
+                                                                                          ]
+                                                                                              .price
+                                                                                }
+                                                                                onChange={e =>
+                                                                                    updateOptionValue(
+                                                                                        "price",
+                                                                                        index,
+                                                                                        e,
+                                                                                        optionValues,
+                                                                                        setOptionValues,
+                                                                                        refresh,
+                                                                                        setRefresh
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                            <label
+                                                                                htmlFor={`price-${index}`}
+                                                                            >
+                                                                                $
+                                                                                {Number(
+                                                                                    price /
+                                                                                        100
+                                                                                ).toFixed(
+                                                                                    2
+                                                                                )}
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="col s2 noselect">
+                                                                        <div className="input-field product-input">
+                                                                            <input
+                                                                                className="browser-default"
+                                                                                id={`stock-${index}`}
+                                                                                type="text"
+                                                                                value={
+                                                                                    !optionValues[
+                                                                                        index
+                                                                                    ]
+                                                                                        ? ""
+                                                                                        : optionValues[
+                                                                                              index
+                                                                                          ]
+                                                                                              .stock
+                                                                                }
+                                                                                onChange={e =>
+                                                                                    updateOptionValue(
+                                                                                        "stock",
+                                                                                        index,
+                                                                                        e,
+                                                                                        optionValues,
+                                                                                        setOptionValues,
+                                                                                        refresh,
+                                                                                        setRefresh
+                                                                                    )
+                                                                                }
+                                                                            />
+
+                                                                            <label
+                                                                                htmlFor={`stock-${index}`}
+                                                                            >
+                                                                                STOCK
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <i className="material-icons noselect">
+                                                                        drag_handle
+                                                                    </i>
+                                                                </div>
+                                                            </li>
+                                                        )}
+                                                    </Draggable>
+                                                );
+                                            }
+                                        )}
+                                        {provided.placeholder}
+                                    </ul>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+
+                        <button
+                            className="add-option"
+                            onClick={() => {
+                                //updated state
+                                let tmp = options;
+                                tmp.push({
+                                    id: `opt-${Math.random() * (100 - 5) + 5}`,
+                                    name: "Option",
+                                    price: "599",
+                                });
+                                updateOptions(tmp);
+                                tmp = optionValues;
+                                //space to prevent if from firing after first time
+                                tmp.push({
+                                    name: " ",
+                                    price: "",
+                                    stock: "",
+                                });
+
+                                //remove init value
+                                if (!tmp[0].name) {
+                                    tmp.splice(0, 1);
+                                }
+                                setOptionValues(tmp);
+                                setRefresh(!refresh);
+                            }}
+                        >
+                            <i className="material-icons">add</i>
+                        </button>
+
+                        <button onClick={() => addOptionsToProduct()}>
+                            Submit
+                        </button>
+                    </div>
+                </div>
+
                 <div
                     style={{
                         display: "flex",
@@ -443,7 +774,7 @@ const EditProduct = () => {
 
                 <div className="products-grid" style={{ marginTop: "32px" }}>
                     <>
-                        {data?.getProduct.images!.map((_val, i) => {
+                        {data?.apiGetProduct.images!.map((_val, i) => {
                             return (
                                 <div
                                     className="card"
@@ -456,7 +787,7 @@ const EditProduct = () => {
                                         onClick={async () => {
                                             let tmp: any = image_ids;
                                             tmp.push(
-                                                data.getProduct.images![i]
+                                                data.apiGetProduct.images![i]
                                                     .img_id
                                             );
                                             setImage_ids(tmp);
@@ -472,7 +803,7 @@ const EditProduct = () => {
                                     <div className="card-image noselect">
                                         <img
                                             src={
-                                                data?.getProduct.images![i]
+                                                data?.apiGetProduct.images![i]
                                                     .img_url ||
                                                 "https://materializecss.com/images/sample-1.jpg"
                                             }
@@ -540,6 +871,33 @@ const toggleDisabledClass = (idList: string[]) => {
         try {
             document.getElementById(idList[i])!.classList.toggle("disabled");
         } catch {}
+    }
+};
+
+const updateOptionValue = (
+    prop,
+    index,
+    e,
+    optionValues,
+    setOptionValues,
+    refresh,
+    setRefresh
+) => {
+    if (!e.target.value && e.target.value !== ".") {
+        let tmp = optionValues;
+
+        tmp[index][prop] = e.target.value;
+
+        setOptionValues(tmp);
+    }
+
+    if (!e.target.value.match(/\D/g)) {
+        let tmp = optionValues;
+
+        tmp[index][prop] = e.target.value;
+
+        setOptionValues(tmp);
+        setRefresh(!refresh);
     }
 };
 

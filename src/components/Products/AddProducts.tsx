@@ -145,7 +145,7 @@ const AddProducts = () => {
                                 if (!e.target.value) {
                                     setPrice(e.target.value);
                                 }
-                                if (e.target.value.match(/\d/g)) {
+                                if (!e.target.value.match(/\D/g)) {
                                     setPrice(e.target.value);
                                 }
                             }}
@@ -167,7 +167,7 @@ const AddProducts = () => {
                                 if (!e.target.value) {
                                     setStock(e.target.value);
                                 }
-                                if (e.target.value.match(/\d/g)) {
+                                if (!e.target.value.match(/\D/g)) {
                                     setStock(e.target.value);
                                 }
                             }}

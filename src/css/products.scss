@@ -21,6 +21,8 @@
 }
 
 .product-input {
+    margin-top: 0;
+    margin-bottom: 0;
     textarea {
         background: #ffffff;
         border: none;
@@ -49,5 +51,31 @@
 
     label {
         margin-left: 8px;
+    }
+}
+
+.add-option {
+    margin-top: -15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #dfe0e6;
+    border: none;
+    color: #6a6d73;
+    cursor: pointer;
+    display: block;
+    font-family: inherit;
+    font-size: 15px;
+    height: 64px;
+    line-height: 64px;
+    padding: 0 32px;
+    position: relative;
+    text-align: center;
+    opacity: 1;
+    white-space: nowrap;
+    width: 100%;
+
+    &:focus {
+        background: #dfe0e6;
     }
 }
