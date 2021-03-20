@@ -7,6 +7,7 @@ import {
     useRemoveImgFromProductMutation,
     useAddOptionToProductMutation,
     useToggleProductDisplayMutation,
+    useDeleteOptionsMutation,
 } from "../../generated/graphql";
 
 const ProductsMutations = () => {
@@ -18,6 +19,8 @@ const ProductsMutations = () => {
     const [deleteImg] = useRemoveImgFromProductMutation();
     const [ADD_OPT_TO_PRODUCT] = useAddOptionToProductMutation();
     const [toggleDisplay] = useToggleProductDisplayMutation();
+    const [deleteOptions] = useDeleteOptionsMutation();
+
     return {
         addProductToSection,
         removeProductFromSection,
@@ -27,6 +30,7 @@ const ProductsMutations = () => {
         deleteImg,
         ADD_OPT_TO_PRODUCT,
         toggleDisplay,
+        deleteOptions,
     };
 };
 

@@ -65,6 +65,7 @@ const EditProduct = () => {
         deleteImg,
         ADD_OPT_TO_PRODUCT,
         toggleDisplay,
+        deleteOptions,
     } = ProductsMutations();
 
     const [refresh, setRefresh] = useState(false);
@@ -87,6 +88,7 @@ const EditProduct = () => {
         },
     ] as any[]);
     const [options, updateOptions] = useState([] as any);
+    const [removedOptions, setRemovedOptions] = useState([] as number[]);
 
     const { sdata, sloading } = GetSections();
     const { pdata, ploading } = GetProductsSections();
@@ -177,7 +179,7 @@ const EditProduct = () => {
             !oloading &&
             !!odata
         ) {
-            if (optionValues[0].init) {
+            if (!!optionValues[0] && optionValues[0].init) {
                 let values = [{}];
                 let options = [{}];
 
@@ -305,6 +307,7 @@ const EditProduct = () => {
     };
 
     const handleSubmit = async () => {
+        debugger;
         // add sections to products
         if (sections.length !== 1) {
             for (let j = 1; j < sections.length; j++) {
@@ -345,6 +348,11 @@ const EditProduct = () => {
                     M.toast({ html: "Could not remove product from Section" });
                 }
             }
+        }
+
+        if (removedOptions.length !== 0) {
+            let options_str = JSON.stringify(removedOptions);
+            await deleteOptions({ variables: { options_str } });
         }
 
         await updateProduct({
@@ -389,43 +397,37 @@ const EditProduct = () => {
         }
 
         // add options
+        if (options.length !== 0) {
+            // get indexes though dom
+            let ul = document.getElementById("options-DD")!;
 
-        window.location.reload();
-    };
+            //create options array to pass into mutation
+            let options = [{}] as any[];
 
-    const addOptionsToProduct = async () => {
-        // get indexes though dom
-        let ul = document.getElementById("options-DD")!;
+            for (let i = 0; i < ul.children.length; i++) {
+                let name: any = document.getElementById(`name-${i}`)!;
+                let price: any = document.getElementById(`price-${i}`)!;
+                let stock: any = document.getElementById(`stock-${i}`);
 
-        //create options array to pass into mutation
-        let options = [{}] as any[];
+                if (name.labels[0].innerHTML.toLowerCase() === "option") {
+                    if (!name.value || !stock.value) {
+                        M.toast({ html: "please add missing values" });
+                        return;
+                    }
+                    let tmp = price.value;
+                    if (!tmp) {
+                        tmp = data?.apiGetProduct.price;
+                    }
 
-        for (let i = 0; i < ul.children.length; i++) {
-            let name: any = document.getElementById(`name-${i}`)!;
-            let price: any = document.getElementById(`price-${i}`)!;
-            let stock: any = document.getElementById(`stock-${i}`);
-
-            console.log("name.label :>> ", name.labels[0].innerHTML);
-            if (name.labels[0].innerHTML.toLowerCase() === "option") {
-                if (!name.value || !stock.value) {
-                    M.toast({ html: "please add missing values" });
-                    return;
+                    options.unshift({
+                        name: name.value,
+                        price: Number(tmp),
+                        stock: Number(stock.value),
+                        index: i,
+                    });
                 }
-                let tmp = price.value;
-                if (!tmp) {
-                    tmp = data?.apiGetProduct.price;
-                }
-
-                options.unshift({
-                    name: name.value,
-                    price: Number(tmp),
-                    stock: Number(stock.value),
-                    index: i,
-                });
             }
-        }
 
-        if (ul.children.length !== odata?.getProductsOptions.length) {
             for (let i = 0; i < options.length; i++) {
                 if (!options[i].name) {
                     options.splice(i, 1);
@@ -441,14 +443,15 @@ const EditProduct = () => {
                 },
             });
 
-            if (res.data?.addOptionToProduct) {
-                window.location.reload();
-            } else {
+            if (!res.data?.addOptionToProduct) {
                 M.toast({ html: "An Error has occured" });
                 M.toast({ html: "Please try refreshing the page" });
                 M.toast({ html: "If error persist check heroku logs" });
+                return;
             }
         }
+
+        window.location.reload();
     };
 
     let product = data!.apiGetProduct;
@@ -765,7 +768,87 @@ const EditProduct = () => {
                                                                     </i>
                                                                     <i
                                                                         className="material-icons red-text noselect"
-                                                                        onClick={() => {}}
+                                                                        onClick={() => {
+                                                                            let length = odata!
+                                                                                .getProductsOptions!
+                                                                                .length;
+                                                                            for (
+                                                                                let i = 0;
+                                                                                i <
+                                                                                length;
+                                                                                i++
+                                                                            ) {
+                                                                                if (
+                                                                                    odata!
+                                                                                        .getProductsOptions[
+                                                                                        i
+                                                                                    ]
+                                                                                        .option_id ===
+                                                                                    Number(
+                                                                                        id
+                                                                                    )
+                                                                                ) {
+                                                                                    let tmp = removedOptions;
+                                                                                    tmp.push(
+                                                                                        Number(
+                                                                                            id
+                                                                                        )
+                                                                                    );
+                                                                                    setRemovedOptions(
+                                                                                        tmp
+                                                                                    );
+
+                                                                                    break;
+                                                                                }
+                                                                            }
+
+                                                                            for (
+                                                                                let i = 0;
+                                                                                i <
+                                                                                options.length;
+                                                                                i++
+                                                                            ) {
+                                                                                if (
+                                                                                    options[
+                                                                                        i
+                                                                                    ]
+                                                                                        .id ===
+                                                                                    id
+                                                                                ) {
+                                                                                    let tmp = options;
+                                                                                    console.log(
+                                                                                        "tmp b4 :>> ",
+                                                                                        tmp
+                                                                                    );
+                                                                                    tmp.splice(
+                                                                                        i,
+                                                                                        1
+                                                                                    );
+                                                                                    console.log(
+                                                                                        "tmp :>> ",
+                                                                                        tmp
+                                                                                    );
+
+                                                                                    updateOptions(
+                                                                                        tmp
+                                                                                    );
+
+                                                                                    tmp = optionValues;
+
+                                                                                    tmp.splice(
+                                                                                        i,
+                                                                                        1
+                                                                                    );
+                                                                                    setOptionValues(
+                                                                                        tmp
+                                                                                    );
+
+                                                                                    setRefresh(
+                                                                                        !refresh
+                                                                                    );
+                                                                                }
+                                                                            }
+                                                                        }}
                                                                     >
                                                                         delete
                                                                     </i>
@@ -815,15 +898,10 @@ const EditProduct = () => {
 
                                 setOptionValues(tmp);
 
-                                console.log("refresh :>> ", refresh);
                                 setRefresh(!refresh);
                             }}
                         >
                             <i className="material-icons">add</i>
-                        </button>
-
-                        <button onClick={() => addOptionsToProduct()}>
-                            Submit
                         </button>
                     </div>
                 </div>
