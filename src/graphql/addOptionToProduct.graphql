@@ -1,0 +1,3 @@
+mutation addOptionToProduct($options_str: String!, $product_id: Float!) {
+    addOptionToProduct(options_str: $options_str, product_id: $product_id)
+}

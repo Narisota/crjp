@@ -1,0 +1,3 @@
+mutation toggleProductDisplay($product_id: Float!) {
+    toggleProductDisplay(product_id: $product_id)
+}
