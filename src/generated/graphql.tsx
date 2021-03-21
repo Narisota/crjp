@@ -215,6 +215,7 @@ export type Mutation = {
   removeProductFromSection: Scalars['Boolean'];
   updateSection: Scalars['Boolean'];
   addOptionToProduct: Scalars['Boolean'];
+  updateOptions: Scalars['Boolean'];
   deleteOptions: Scalars['Boolean'];
 };
 
@@ -390,6 +391,11 @@ export type MutationUpdateSectionArgs = {
 
 export type MutationAddOptionToProductArgs = {
   product_id: Scalars['Float'];
+  options_str: Scalars['String'];
+};
+
+
+export type MutationUpdateOptionsArgs = {
   options_str: Scalars['String'];
 };
 
@@ -832,6 +838,16 @@ export type ToggleSocialDisplayMutationVariables = Exact<{
 export type ToggleSocialDisplayMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'toggleSocialDisplay'>
+);
+
+export type UpdateOptionsMutationVariables = Exact<{
+  options_str: Scalars['String'];
+}>;
+
+
+export type UpdateOptionsMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'updateOptions'>
 );
 
 export type UpdateProductMutationVariables = Exact<{
@@ -2114,6 +2130,36 @@ export function useToggleSocialDisplayMutation(baseOptions?: Apollo.MutationHook
 export type ToggleSocialDisplayMutationHookResult = ReturnType<typeof useToggleSocialDisplayMutation>;
 export type ToggleSocialDisplayMutationResult = Apollo.MutationResult<ToggleSocialDisplayMutation>;
 export type ToggleSocialDisplayMutationOptions = Apollo.BaseMutationOptions<ToggleSocialDisplayMutation, ToggleSocialDisplayMutationVariables>;
+export const UpdateOptionsDocument = gql`
+    mutation updateOptions($options_str: String!) {
+  updateOptions(options_str: $options_str)
+}
+    `;
+export type UpdateOptionsMutationFn = Apollo.MutationFunction<UpdateOptionsMutation, UpdateOptionsMutationVariables>;
+
+/**
+ * __useUpdateOptionsMutation__
+ *
+ * To run a mutation, you first call `useUpdateOptionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateOptionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateOptionsMutation, { data, loading, error }] = useUpdateOptionsMutation({
+ *   variables: {
+ *      options_str: // value for 'options_str'
+ *   },
+ * });
+ */
+export function useUpdateOptionsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateOptionsMutation, UpdateOptionsMutationVariables>) {
+        return Apollo.useMutation<UpdateOptionsMutation, UpdateOptionsMutationVariables>(UpdateOptionsDocument, baseOptions);
+      }
+export type UpdateOptionsMutationHookResult = ReturnType<typeof useUpdateOptionsMutation>;
+export type UpdateOptionsMutationResult = Apollo.MutationResult<UpdateOptionsMutation>;
+export type UpdateOptionsMutationOptions = Apollo.BaseMutationOptions<UpdateOptionsMutation, UpdateOptionsMutationVariables>;
 export const UpdateProductDocument = gql`
     mutation updateProduct($product_id: Float!, $name: String!, $desc: String!, $price: Float!, $stock: Float!) {
   updateProduct(

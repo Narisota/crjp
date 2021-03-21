@@ -4,6 +4,7 @@ import {
     useApiGetProductQuery,
     useGetProductsOptionsQuery,
     useGetProductsSectionsQuery,
+    useUpdateOptionsMutation,
 } from "../../generated/graphql";
 import Dropzone from "react-dropzone";
 import { Redirect } from "react-router-dom";
@@ -66,7 +67,10 @@ const EditProduct = () => {
         ADD_OPT_TO_PRODUCT,
         toggleDisplay,
         deleteOptions,
+        // UPDATE_OPTS,
     } = ProductsMutations();
+
+    const [UPDATE_OPTS] = useUpdateOptionsMutation();
 
     const [refresh, setRefresh] = useState(false);
     const [name, setName] = useState("");
@@ -87,6 +91,7 @@ const EditProduct = () => {
             price: "",
         },
     ] as any[]);
+
     const [options, updateOptions] = useState([] as any);
     const [removedOptions, setRemovedOptions] = useState([] as number[]);
 
@@ -251,6 +256,7 @@ const EditProduct = () => {
         return <>...loading</>;
     }
 
+    console.log("odata :>> ", odata);
     if (error) {
         return <Redirect to="/products" />;
     }
@@ -403,6 +409,7 @@ const EditProduct = () => {
 
             //create options array to pass into mutation
             let options = [{}] as any[];
+            let updatedOptions = [{}] as any[];
 
             for (let i = 0; i < ul.children.length; i++) {
                 let name: any = document.getElementById(`name-${i}`)!;
@@ -425,6 +432,25 @@ const EditProduct = () => {
                         stock: Number(stock.value),
                         index: i,
                     });
+                } else {
+                    let tmp = price.value;
+                    if (!tmp) {
+                        tmp = data?.apiGetProduct.price;
+                    }
+
+                    //get current index from ul
+
+                    let option_id =
+                        ul.children[i].attributes["data-rbd-draggable-id"]
+                            .value;
+
+                    updatedOptions.unshift({
+                        name: name.value,
+                        price: Number(tmp),
+                        stock: Number(stock.value),
+                        index: i,
+                        option_id,
+                    });
                 }
             }
 
@@ -440,6 +466,15 @@ const EditProduct = () => {
                 variables: {
                     options_str,
                     product_id,
+                },
+            });
+
+            options_str = JSON.stringify(updatedOptions);
+
+            console.log("updatedOptions :>> ", updatedOptions);
+            await UPDATE_OPTS({
+                variables: {
+                    options_str,
                 },
             });
 
@@ -581,6 +616,8 @@ const EditProduct = () => {
                                                 { id, name, price, stock },
                                                 index: any
                                             ) => {
+                                                // sortByProp(options, "index");
+
                                                 return (
                                                     <Draggable
                                                         key={`${id}`}

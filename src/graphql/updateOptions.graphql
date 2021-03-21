@@ -1,0 +1,3 @@
+mutation updateOptions($options_str: String!) {
+    updateOptions(options_str: $options_str)
+}
