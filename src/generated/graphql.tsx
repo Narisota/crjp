@@ -19,6 +19,7 @@ export type Query = {
   getOrders: Array<GetOrdersResponse>;
   getOrderById: GetOrdersResponse;
   getProducts: Array<ProductsWithImages>;
+  getProductsByIds: Array<ProductsWithOptionAndImages>;
   apiGetProducts: Array<ProductsWithImages>;
   getProduct: ProductsWithImages;
   apiGetProduct: ProductsWithImages;
@@ -33,11 +34,17 @@ export type Query = {
   getProductsSections: Array<SectionsOrNull>;
   getSectionsProducts: Array<ProductsWithImages>;
   getProductsOptions: Array<Options>;
+  getProductShipping: Scalars['String'];
 };
 
 
 export type QueryGetOrderByIdArgs = {
   order_id: Scalars['Float'];
+};
+
+
+export type QueryGetProductsByIdsArgs = {
+  products_str: Scalars['String'];
 };
 
 
@@ -72,6 +79,11 @@ export type QueryGetSectionsProductsArgs = {
 
 
 export type QueryGetProductsOptionsArgs = {
+  product_id: Scalars['Float'];
+};
+
+
+export type QueryGetProductShippingArgs = {
   product_id: Scalars['Float'];
 };
 
@@ -120,6 +132,28 @@ export type ProductsWithImages = {
   exp_date?: Maybe<Scalars['String']>;
   images?: Maybe<Array<Images>>;
   hidden: Scalars['Boolean'];
+};
+
+export type ProductsWithOptionAndImages = {
+  __typename?: 'ProductsWithOptionAndImages';
+  product_id: Scalars['Int'];
+  name: Scalars['String'];
+  desc: Scalars['String'];
+  price: Scalars['Int'];
+  stock: Scalars['Int'];
+  org_stock?: Maybe<Scalars['Int']>;
+  exp_date?: Maybe<Scalars['String']>;
+  images?: Maybe<Array<Images>>;
+  options?: Maybe<Array<Options>>;
+};
+
+export type Options = {
+  __typename?: 'Options';
+  option_id: Scalars['Int'];
+  name: Scalars['String'];
+  price: Scalars['Int'];
+  stock: Scalars['Int'];
+  index: Scalars['Int'];
 };
 
 export type ApiUser = {
@@ -173,20 +207,11 @@ export type SectionsOrNull = {
   thumbnail?: Maybe<Scalars['String']>;
 };
 
-export type Options = {
-  __typename?: 'Options';
-  option_id: Scalars['Int'];
-  name: Scalars['String'];
-  price: Scalars['Int'];
-  stock: Scalars['Int'];
-  index: Scalars['Int'];
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   editTracking: Scalars['Boolean'];
   paypalCheckout: Scalars['String'];
-  addPaypalOrder: Scalars['Boolean'];
+  addPaypalOrder: Scalars['String'];
   checkout: Scalars['String'];
   toggleProductDisplay: Scalars['Boolean'];
   addProduct: Scalars['String'];
@@ -217,6 +242,7 @@ export type Mutation = {
   addOptionToProduct: Scalars['Boolean'];
   updateOptions: Scalars['Boolean'];
   deleteOptions: Scalars['Boolean'];
+  addShippingToProduct: Scalars['Boolean'];
 };
 
 
@@ -404,6 +430,12 @@ export type MutationDeleteOptionsArgs = {
   options_str: Scalars['String'];
 };
 
+
+export type MutationAddShippingToProductArgs = {
+  shipping_str: Scalars['String'];
+  product_id: Scalars['Float'];
+};
+
 export type AuthResponse = {
   __typename?: 'AuthResponse';
   accessToken?: Maybe<Scalars['String']>;
@@ -497,6 +529,17 @@ export type AddSectionMutationVariables = Exact<{
 export type AddSectionMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'addSection'>
+);
+
+export type AddShippingToProductMutationVariables = Exact<{
+  product_id: Scalars['Float'];
+  shipping_str: Scalars['String'];
+}>;
+
+
+export type AddShippingToProductMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'addShippingToProduct'>
 );
 
 export type ApiLoginMutationVariables = Exact<{
@@ -1137,6 +1180,37 @@ export function useAddSectionMutation(baseOptions?: Apollo.MutationHookOptions<A
 export type AddSectionMutationHookResult = ReturnType<typeof useAddSectionMutation>;
 export type AddSectionMutationResult = Apollo.MutationResult<AddSectionMutation>;
 export type AddSectionMutationOptions = Apollo.BaseMutationOptions<AddSectionMutation, AddSectionMutationVariables>;
+export const AddShippingToProductDocument = gql`
+    mutation addShippingToProduct($product_id: Float!, $shipping_str: String!) {
+  addShippingToProduct(product_id: $product_id, shipping_str: $shipping_str)
+}
+    `;
+export type AddShippingToProductMutationFn = Apollo.MutationFunction<AddShippingToProductMutation, AddShippingToProductMutationVariables>;
+
+/**
+ * __useAddShippingToProductMutation__
+ *
+ * To run a mutation, you first call `useAddShippingToProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddShippingToProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addShippingToProductMutation, { data, loading, error }] = useAddShippingToProductMutation({
+ *   variables: {
+ *      product_id: // value for 'product_id'
+ *      shipping_str: // value for 'shipping_str'
+ *   },
+ * });
+ */
+export function useAddShippingToProductMutation(baseOptions?: Apollo.MutationHookOptions<AddShippingToProductMutation, AddShippingToProductMutationVariables>) {
+        return Apollo.useMutation<AddShippingToProductMutation, AddShippingToProductMutationVariables>(AddShippingToProductDocument, baseOptions);
+      }
+export type AddShippingToProductMutationHookResult = ReturnType<typeof useAddShippingToProductMutation>;
+export type AddShippingToProductMutationResult = Apollo.MutationResult<AddShippingToProductMutation>;
+export type AddShippingToProductMutationOptions = Apollo.BaseMutationOptions<AddShippingToProductMutation, AddShippingToProductMutationVariables>;
 export const ApiLoginDocument = gql`
     mutation apiLogin($username: String!, $password: String!) {
   apiLogin(username: $username, password: $password) {

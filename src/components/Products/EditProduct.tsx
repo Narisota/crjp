@@ -67,10 +67,9 @@ const EditProduct = () => {
         ADD_OPT_TO_PRODUCT,
         toggleDisplay,
         deleteOptions,
-        // UPDATE_OPTS,
+        UPDATE_OPTS,
+        addShippingToProduct,
     } = ProductsMutations();
-
-    const [UPDATE_OPTS] = useUpdateOptionsMutation();
 
     const [refresh, setRefresh] = useState(false);
     const [name, setName] = useState("");
@@ -95,6 +94,18 @@ const EditProduct = () => {
     const [options, updateOptions] = useState([] as any);
     const [removedOptions, setRemovedOptions] = useState([] as number[]);
 
+    const [shipping, updateShipping] = useState([] as any);
+    const [removedShipping, setRemovedShipping] = useState([] as number[]);
+
+    const [shippingValues, setShippingValues] = useState([
+        {
+            id: "",
+            country: "",
+            init: true,
+            price: "",
+        },
+    ] as any[]);
+
     const { sdata, sloading } = GetSections();
     const { pdata, ploading } = GetProductsSections();
     const { odata, oloading } = GetProductsOptions();
@@ -104,7 +115,7 @@ const EditProduct = () => {
         },
     });
 
-    function handleOnDragEnd(result: any) {
+    function handleOptionsOnDragEnd(result: any) {
         if (!result.destination) return;
 
         const items = Array.from(options);
@@ -120,6 +131,24 @@ const EditProduct = () => {
         values.splice(result.destination.index, 0, reorderedValue);
 
         setOptionValues(values);
+    }
+
+    function handleShippingOnDragEnd(result: any) {
+        if (!result.destination) return;
+
+        const items = Array.from(shipping);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        updateShipping(items);
+
+        //reorder values state
+        let values = shippingValues;
+
+        const [reorderedValue] = values.splice(result.source.index, 1);
+        values.splice(result.destination.index, 0, reorderedValue);
+
+        setShippingValues(values);
     }
 
     const onChipDeleteCB = (_e: any, i: any) => {
@@ -172,7 +201,7 @@ const EditProduct = () => {
 
     useEffect(() => {
         M.Modal.init(document.querySelectorAll(".modal"));
-
+        M.Dropdown.init(document.querySelectorAll(".dropdown-trigger"));
         let autoCompleteData: any = {},
             initialChips = [] as any[];
 
@@ -313,7 +342,6 @@ const EditProduct = () => {
     };
 
     const handleSubmit = async () => {
-        debugger;
         // add sections to products
         if (sections.length !== 1) {
             for (let j = 1; j < sections.length; j++) {
@@ -439,7 +467,6 @@ const EditProduct = () => {
                     }
 
                     //get current index from ul
-
                     let option_id =
                         ul.children[i].attributes["data-rbd-draggable-id"]
                             .value;
@@ -486,6 +513,11 @@ const EditProduct = () => {
             }
         }
 
+        debugger;
+
+        if (shipping.length !== 0) {
+            let shipping_str = JSON.stringify(shipping);
+        }
         window.location.reload();
     };
 
@@ -602,11 +634,10 @@ const EditProduct = () => {
                             <span>Price</span>
                         </div>
 
-                        <DragDropContext onDragEnd={handleOnDragEnd}>
-                            <Droppable droppableId="characters">
+                        <DragDropContext onDragEnd={handleOptionsOnDragEnd}>
+                            <Droppable droppableId="options">
                                 {provided => (
                                     <ul
-                                        className="characters"
                                         id="options-DD"
                                         {...provided.droppableProps}
                                         ref={provided.innerRef}
@@ -921,7 +952,6 @@ const EditProduct = () => {
                                 q = optionValues;
                                 tmp = q;
 
-                                //space to prevent if from firing after first time
                                 tmp.push({
                                     name: "",
                                     price: "",
@@ -935,6 +965,238 @@ const EditProduct = () => {
 
                                 setOptionValues(tmp);
 
+                                setRefresh(!refresh);
+                            }}
+                        >
+                            <i className="material-icons">add</i>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="container">
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <span>Shipping</span>
+                        </div>
+
+                        <DragDropContext onDragEnd={handleShippingOnDragEnd}>
+                            <Droppable droppableId="shipping">
+                                {provided => (
+                                    <ul
+                                        id="shipping-DD"
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                    >
+                                        {shipping.map(
+                                            (
+                                                { id, country, price },
+                                                index: any
+                                            ) => {
+                                                console.log(`index`, index);
+                                                return (
+                                                    <Draggable
+                                                        key={`${id}`}
+                                                        draggableId={`${id}`}
+                                                        index={index}
+                                                    >
+                                                        {prov => (
+                                                            <li
+                                                                ref={
+                                                                    prov.innerRef
+                                                                }
+                                                                {...prov.draggableProps}
+                                                                {...prov.dragHandleProps}
+                                                            >
+                                                                <div
+                                                                    style={{
+                                                                        width:
+                                                                            "100%",
+                                                                        display:
+                                                                            "flex",
+                                                                        justifyContent:
+                                                                            "space-between",
+                                                                        backgroundColor:
+                                                                            "white",
+
+                                                                        margin: 0,
+                                                                        borderBottom:
+                                                                            "1px solid #f2f3f7",
+                                                                    }}
+                                                                    className="row"
+                                                                >
+                                                                    <div className="col s3">
+                                                                        <div className="input-field product-input">
+                                                                            <input
+                                                                                className="browser-default"
+                                                                                id={`shipping_country-${index}`}
+                                                                                type="text"
+                                                                                value={
+                                                                                    shippingValues[
+                                                                                        index
+                                                                                    ]
+                                                                                        .country
+                                                                                }
+                                                                                onChange={e => {
+                                                                                    let tmp = shippingValues;
+                                                                                    tmp[
+                                                                                        index
+                                                                                    ].country =
+                                                                                        e.target.value;
+                                                                                    setShippingValues(
+                                                                                        tmp
+                                                                                    );
+                                                                                    setRefresh(
+                                                                                        !refresh
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                            <label
+                                                                                htmlFor={`shipping_country-${index}`}
+                                                                            >
+                                                                                {
+                                                                                    country
+                                                                                }{" "}
+                                                                                US
+                                                                                OR
+                                                                                EL
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="col s5 noselect">
+                                                                        <div className="input-field product-input">
+                                                                            <input
+                                                                                className="browser-default"
+                                                                                id={`shipping_price-${index}`}
+                                                                                type="text"
+                                                                                value={
+                                                                                    shippingValues[
+                                                                                        index
+                                                                                    ]
+                                                                                        .price
+                                                                                }
+                                                                                onChange={e => {
+                                                                                    let tmp = shippingValues;
+                                                                                    tmp[
+                                                                                        index
+                                                                                    ].price =
+                                                                                        e.target.value;
+                                                                                    setShippingValues(
+                                                                                        tmp
+                                                                                    );
+                                                                                    setRefresh(
+                                                                                        !refresh
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                            <label
+                                                                                htmlFor={`shipping_price-${index}`}
+                                                                            >
+                                                                                {
+                                                                                    price
+                                                                                }
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <i className="material-icons noselect">
+                                                                        drag_handle
+                                                                    </i>
+                                                                    <i
+                                                                        className="material-icons red-text noselect"
+                                                                        onClick={() => {
+                                                                            //if there's data set removed options
+                                                                            console.log(
+                                                                                "id :>> ",
+                                                                                id
+                                                                            );
+                                                                            // else remove from state
+                                                                            for (
+                                                                                let j = 0;
+                                                                                j <
+                                                                                shipping.length;
+                                                                                j++
+                                                                            ) {
+                                                                                if (
+                                                                                    shipping[
+                                                                                        j
+                                                                                    ]
+                                                                                        .id ===
+                                                                                    id
+                                                                                ) {
+                                                                                    let tmp = shipping;
+                                                                                    tmp.splice(
+                                                                                        j,
+                                                                                        1
+                                                                                    );
+
+                                                                                    updateShipping(
+                                                                                        tmp
+                                                                                    );
+
+                                                                                    tmp = shippingValues;
+                                                                                    tmp.splice(
+                                                                                        j,
+                                                                                        1
+                                                                                    );
+
+                                                                                    setShippingValues(
+                                                                                        tmp
+                                                                                    );
+
+                                                                                    setRefresh(
+                                                                                        !refresh
+                                                                                    );
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        delete
+                                                                    </i>
+                                                                </div>
+                                                            </li>
+                                                        )}
+                                                    </Draggable>
+                                                );
+                                            }
+                                        )}
+                                        {provided.placeholder}
+                                    </ul>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+
+                        <button
+                            className="add-option"
+                            onClick={() => {
+                                let q = shipping;
+                                let tmp = q;
+                                tmp.push({
+                                    id: `shipping-${Number(
+                                        Math.random() * (100 - 5) + 5
+                                    ).toFixed(2)}`,
+                                    country: "Country",
+                                    price: "Shipping Price",
+                                });
+
+                                updateShipping(tmp);
+
+                                q = shippingValues;
+                                tmp = q;
+
+                                tmp.push({ country: "", price: "" });
+
+                                //remove init value
+                                if (tmp[0].init) {
+                                    tmp.splice(0, 1);
+                                }
+
+                                setShippingValues(tmp);
                                 setRefresh(!refresh);
                             }}
                         >
@@ -1018,6 +1280,7 @@ const EditProduct = () => {
                             );
                         })}
                     </>
+
                     {image_urls.length === 0 ? (
                         <></>
                     ) : (
