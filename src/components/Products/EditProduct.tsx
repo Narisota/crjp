@@ -516,9 +516,19 @@ const EditProduct = () => {
         debugger;
 
         if (shipping.length !== 0) {
-            let shipping_str = JSON.stringify(shipping);
+            let shipping_str = JSON.stringify(shippingValues);
+            console.log("shipping_str :>> ", shipping_str);
+
+            let response = await addShippingToProduct({
+                variables: {
+                    product_id,
+                    shipping_str,
+                },
+            });
+
+            console.log("response :>> ", response);
         }
-        window.location.reload();
+        // window.location.reload();
     };
 
     let product = data!.apiGetProduct;
