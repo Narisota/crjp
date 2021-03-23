@@ -34,7 +34,7 @@ export type Query = {
   getProductsSections: Array<SectionsOrNull>;
   getSectionsProducts: Array<ProductsWithImages>;
   getProductsOptions: Array<Options>;
-  getProductShipping: Scalars['String'];
+  getProductShipping: Array<Shipping>;
 };
 
 
@@ -205,6 +205,13 @@ export type SectionsOrNull = {
   section_id?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   thumbnail?: Maybe<Scalars['String']>;
+};
+
+export type Shipping = {
+  __typename?: 'Shipping';
+  shipping_id: Scalars['Int'];
+  country: Scalars['String'];
+  price: Scalars['Float'];
 };
 
 export type Mutation = {
@@ -723,6 +730,19 @@ export type ApiGetProductQuery = (
       & Pick<Images, 'img_id' | 'img_url'>
     )>> }
   ) }
+);
+
+export type GetProductShippingQueryVariables = Exact<{
+  product_id: Scalars['Float'];
+}>;
+
+
+export type GetProductShippingQuery = (
+  { __typename?: 'Query' }
+  & { getProductShipping: Array<(
+    { __typename?: 'Shipping' }
+    & Pick<Shipping, 'shipping_id' | 'country' | 'price'>
+  )> }
 );
 
 export type ApiGetProductsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -1738,6 +1758,41 @@ export function useApiGetProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type ApiGetProductQueryHookResult = ReturnType<typeof useApiGetProductQuery>;
 export type ApiGetProductLazyQueryHookResult = ReturnType<typeof useApiGetProductLazyQuery>;
 export type ApiGetProductQueryResult = Apollo.QueryResult<ApiGetProductQuery, ApiGetProductQueryVariables>;
+export const GetProductShippingDocument = gql`
+    query getProductShipping($product_id: Float!) {
+  getProductShipping(product_id: $product_id) {
+    shipping_id
+    country
+    price
+  }
+}
+    `;
+
+/**
+ * __useGetProductShippingQuery__
+ *
+ * To run a query within a React component, call `useGetProductShippingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProductShippingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProductShippingQuery({
+ *   variables: {
+ *      product_id: // value for 'product_id'
+ *   },
+ * });
+ */
+export function useGetProductShippingQuery(baseOptions: Apollo.QueryHookOptions<GetProductShippingQuery, GetProductShippingQueryVariables>) {
+        return Apollo.useQuery<GetProductShippingQuery, GetProductShippingQueryVariables>(GetProductShippingDocument, baseOptions);
+      }
+export function useGetProductShippingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProductShippingQuery, GetProductShippingQueryVariables>) {
+          return Apollo.useLazyQuery<GetProductShippingQuery, GetProductShippingQueryVariables>(GetProductShippingDocument, baseOptions);
+        }
+export type GetProductShippingQueryHookResult = ReturnType<typeof useGetProductShippingQuery>;
+export type GetProductShippingLazyQueryHookResult = ReturnType<typeof useGetProductShippingLazyQuery>;
+export type GetProductShippingQueryResult = Apollo.QueryResult<GetProductShippingQuery, GetProductShippingQueryVariables>;
 export const ApiGetProductsDocument = gql`
     query apiGetProducts {
   apiGetProducts {

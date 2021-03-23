@@ -1,59 +1,15 @@
 import { useEffect, useState } from "react";
-import {
-    useGetSectionsQuery,
-    useApiGetProductQuery,
-    useGetProductsOptionsQuery,
-    useGetProductsSectionsQuery,
-    useUpdateOptionsMutation,
-} from "../../generated/graphql";
+import { useApiGetProductQuery } from "../../generated/graphql";
 import Dropzone from "react-dropzone";
 import { Redirect } from "react-router-dom";
 import Axios from "axios";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { GetProductId } from "./GetProductId";
 import ProductsMutations from "./ProductsMutations";
-
-const GetSections = () => {
-    const { data, loading } = useGetSectionsQuery();
-
-    let sloading = loading;
-    let sdata = data;
-    return { sdata, sloading };
-};
-
-const GetProductsSections = () => {
-    var product_id = GetProductId();
-    const { data, loading } = useGetProductsSectionsQuery({
-        variables: {
-            product_id,
-        },
-    });
-
-    let pdata = data,
-        ploading = loading;
-
-    return {
-        pdata,
-        ploading,
-    };
-};
-
-const GetProductsOptions = () => {
-    var product_id = GetProductId();
-    const { data, loading } = useGetProductsOptionsQuery({
-        variables: {
-            product_id,
-        },
-    });
-
-    let odata = data,
-        oloading = loading;
-
-    return {
-        odata,
-        oloading,
-    };
-};
+import { GetProductsSections } from "./QueryHooks/GetProductsSections";
+import { GetProductsOptions } from "./QueryHooks/GetProductOptions";
+import { GetProductShipping } from "./QueryHooks/GetProductShipping";
+import { GetSections } from "./QueryHooks/GetSections";
 
 const EditProduct = () => {
     var product_id = GetProductId();
@@ -109,6 +65,8 @@ const EditProduct = () => {
     const { sdata, sloading } = GetSections();
     const { pdata, ploading } = GetProductsSections();
     const { odata, oloading } = GetProductsOptions();
+    const { shdata, shloading } = GetProductShipping();
+
     const { data, loading, error } = useApiGetProductQuery({
         variables: {
             product_id,
@@ -281,11 +239,12 @@ const EditProduct = () => {
         }
     });
 
-    if (loading || sloading || ploading || oloading) {
+    if (loading || sloading || ploading || oloading || shloading) {
         return <>...loading</>;
     }
 
     console.log("odata :>> ", odata);
+    console.log("shdata :>> ", shdata);
     if (error) {
         return <Redirect to="/products" />;
     }
@@ -526,6 +485,12 @@ const EditProduct = () => {
                 },
             });
 
+            if (!response.data || !response.data.addShippingToProduct) {
+                M.toast({ html: "An Error has occured" });
+                M.toast({ html: "Please try refreshing the page" });
+                M.toast({ html: "If error persist check heroku logs" });
+                return;
+            }
             console.log("response :>> ", response);
         }
         // window.location.reload();
