@@ -1,6 +1,6 @@
-import { useGetProductsQuery } from "../../generated/graphql";
 import "../../css/products.scss";
 import { useLocation } from "react-router-dom";
+import { useApiGetProductsQuery } from "../../generated/graphql";
 
 const Products = () => {
     const location: any = useLocation();
@@ -10,7 +10,7 @@ const Products = () => {
         }
     }
 
-    const { data, loading, error } = useGetProductsQuery();
+    const { data, loading, error } = useApiGetProductsQuery();
 
     if (loading) {
         return <>...loading</>;
@@ -59,8 +59,8 @@ const Products = () => {
             </nav>
 
             <div className="products-grid">
-                {data?.getProducts.map((_val, i) => {
-                    let product: any = data.getProducts[i];
+                {data?.apiGetProducts.map((_val, i) => {
+                    let product: any = data.apiGetProducts[i];
                     return (
                         <div
                             className="card"

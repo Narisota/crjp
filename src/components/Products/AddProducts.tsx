@@ -19,8 +19,8 @@ const AddProducts = () => {
     const [redirect, setRedirect] = useState(false);
 
     const handleSubmit = async () => {
-        if (!name || !desc || !price || !stock) {
-            inputValidation(name, desc, price, stock);
+        if (!name || !desc || !price || !stock || !image_urls[0]) {
+            inputValidation(name, desc, price, stock, image_urls);
         } else {
             try {
                 let product_id = await addProduct({
@@ -55,7 +55,18 @@ const AddProducts = () => {
             for (let i = 0; i < files.length; i++) {
                 const form = new FormData();
 
-                form.append("api_key", "767632178961832"); //get api key from cloudinary
+                if (
+                    !process.env.REACT_APP_CLOUDINARY_CLOUD_NAME ||
+                    !process.env.REACT_APP_CLOUDINARY_API_KEY
+                ) {
+                    M.toast({ html: "env err" });
+                    return;
+                }
+
+                form.append(
+                    "api_key",
+                    `${process.env.REACT_APP_CLOUDINARY_API_KEY}`
+                ); //get api key from cloudinary
 
                 form.append("file", files[i]);
                 form.append("tags", `codeinfuse, medium, gist`);
@@ -65,7 +76,7 @@ const AddProducts = () => {
 
                 // "https://api.cloudinary.com/v1_1/CLOUD_NAME/image/upload"
                 let res = await Axios.post(
-                    "https://api.cloudinary.com/v1_1/desimqzzy/image/upload",
+                    `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
                     form,
                     {
                         headers: {
@@ -134,7 +145,7 @@ const AddProducts = () => {
                                 if (!e.target.value) {
                                     setPrice(e.target.value);
                                 }
-                                if (e.target.value.match(/\d/g)) {
+                                if (!e.target.value.match(/\D/g)) {
                                     setPrice(e.target.value);
                                 }
                             }}
@@ -156,7 +167,7 @@ const AddProducts = () => {
                                 if (!e.target.value) {
                                     setStock(e.target.value);
                                 }
-                                if (e.target.value.match(/\d/g)) {
+                                if (!e.target.value.match(/\D/g)) {
                                     setStock(e.target.value);
                                 }
                             }}
@@ -217,7 +228,13 @@ const AddProducts = () => {
 };
 export default AddProducts;
 
-const inputValidation = (name: any, desc: any, price: any, stock: any) => {
+const inputValidation = (
+    name: any,
+    desc: any,
+    price: any,
+    stock: any,
+    image_urls: any
+) => {
     let ids = ["name", "desc", "price", "stock"],
         doc = document;
 
@@ -238,5 +255,9 @@ const inputValidation = (name: any, desc: any, price: any, stock: any) => {
     }
     if (!stock) {
         doc.getElementById("stock")!.classList.add("invalid");
+    }
+
+    if (!image_urls[0]) {
+        M.toast({ html: "Please add an image to continue" });
     }
 };

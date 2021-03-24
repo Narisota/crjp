@@ -1,0 +1,9 @@
+query getProductsOptions($product_id: Float!) {
+    getProductsOptions(product_id: $product_id) {
+        option_id
+        name
+        price
+        stock
+        index
+    }
+}

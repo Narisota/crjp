@@ -1,0 +1,3 @@
+mutation addShippingToProduct($product_id: Float!, $shipping_str: String!) {
+    addShippingToProduct(product_id: $product_id, shipping_str: $shipping_str)
+}

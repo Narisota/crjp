@@ -1,5 +1,5 @@
-query getProduct($product_id: Float!) {
-    getProduct(product_id: $product_id) {
+query apiGetProduct($product_id: Float!) {
+    apiGetProduct(product_id: $product_id) {
         product_id
         name
         desc
@@ -10,5 +10,6 @@ query getProduct($product_id: Float!) {
             img_id
             img_url
         }
+        hidden
     }
 }

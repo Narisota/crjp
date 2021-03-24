@@ -19,3 +19,63 @@
 .bold {
     font-weight: bold;
 }
+
+.product-input {
+    margin-top: 0;
+    margin-bottom: 0;
+    textarea {
+        background: #ffffff;
+        border: none;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        outline: none;
+        height: 2.9rem;
+        width: 100%;
+        font-size: 16px;
+        margin: 0 0 8px 0;
+        padding: 0 0 0 8px;
+    }
+
+    input {
+        background: #ffffff;
+        border: none;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        outline: none;
+        height: 2.9rem;
+        width: 100%;
+        font-size: 16px;
+        margin: 0 0 8px 0;
+        padding: 0 0 0 8px;
+    }
+
+    label {
+        margin-left: 8px;
+    }
+}
+
+.add-option {
+    margin-top: -15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #dfe0e6;
+    border: none;
+    color: #6a6d73;
+    cursor: pointer;
+    display: block;
+    font-family: inherit;
+    font-size: 15px;
+    height: 64px;
+    line-height: 64px;
+    padding: 0 32px;
+    position: relative;
+    text-align: center;
+    opacity: 1;
+    white-space: nowrap;
+    width: 100%;
+
+    &:focus {
+        background: #dfe0e6;
+    }
+}
