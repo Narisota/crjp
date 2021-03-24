@@ -169,14 +169,15 @@ const EditProduct = () => {
             !ploading &&
             !!pdata &&
             !oloading &&
-            !!odata
+            !!odata &&
+            !shloading &&
+            !!shdata
         ) {
             if (!!optionValues[0] && optionValues[0].init) {
-                let values = [{}];
-                let options = [{}];
+                let values = [{}],
+                    options = [{}];
 
-                if (odata.getProductsOptions.length === 0) {
-                } else {
+                if (odata.getProductsOptions.length !== 0) {
                     for (let i = 0; i < odata.getProductsOptions.length; i++) {
                         let opt = odata.getProductsOptions[i];
 
@@ -196,6 +197,26 @@ const EditProduct = () => {
                     }
                     updateOptions(options);
                     setOptionValues(values);
+                }
+            }
+
+            if (!!shippingValues[0] && shippingValues[0].init) {
+                let values = [{}],
+                    shipping = [{}];
+                if (shdata.getProductShipping.length !== 0) {
+                    for (let i = 0; i < shdata.getProductShipping.length; i++) {
+                        let sh = shdata.getProductShipping[i];
+
+                        values[i] = { country: "", price: "" };
+                        shipping[i] = {
+                            id: `${sh.shipping_id}`,
+                            country: `${sh.country}`,
+                            price: `${sh.price}`,
+                        };
+                    }
+
+                    updateShipping(shipping);
+                    setShippingValues(values);
                 }
             }
 
@@ -245,6 +266,7 @@ const EditProduct = () => {
 
     console.log("odata :>> ", odata);
     console.log("shdata :>> ", shdata);
+
     if (error) {
         return <Redirect to="/products" />;
     }
