@@ -1,21 +1,20 @@
 {
   "files": {
     "main.css": "/crjp/static/css/main.938e90dd.chunk.css",
-
-    "main.js": "/crjp/static/js/main.cf7580b5.chunk.js",
-    "main.js.map": "/crjp/static/js/main.cf7580b5.chunk.js.map",
-    "runtime-main.js": "/crjp/static/js/runtime-main.8386dc90.js",
-    "runtime-main.js.map": "/crjp/static/js/runtime-main.8386dc90.js.map",
-    "static/js/2.3bb2f6aa.chunk.js": "/crjp/static/js/2.3bb2f6aa.chunk.js",
-    "static/js/2.3bb2f6aa.chunk.js.map": "/crjp/static/js/2.3bb2f6aa.chunk.js.map",
+    "main.js": "/crjp/static/js/main.dcbadb98.chunk.js",
+    "main.js.map": "/crjp/static/js/main.dcbadb98.chunk.js.map",
+    "runtime-main.js": "/crjp/static/js/runtime-main.dbcb1df4.js",
+    "runtime-main.js.map": "/crjp/static/js/runtime-main.dbcb1df4.js.map",
+    "static/js/2.8b67ffc6.chunk.js": "/crjp/static/js/2.8b67ffc6.chunk.js",
+    "static/js/2.8b67ffc6.chunk.js.map": "/crjp/static/js/2.8b67ffc6.chunk.js.map",
     "index.html": "/crjp/index.html",
     "static/css/main.938e90dd.chunk.css.map": "/crjp/static/css/main.938e90dd.chunk.css.map",
-    "static/js/2.3bb2f6aa.chunk.js.LICENSE.txt": "/crjp/static/js/2.3bb2f6aa.chunk.js.LICENSE.txt"
+    "static/js/2.8b67ffc6.chunk.js.LICENSE.txt": "/crjp/static/js/2.8b67ffc6.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.8386dc90.js",
-    "static/js/2.3bb2f6aa.chunk.js",
+    "static/js/runtime-main.dbcb1df4.js",
+    "static/js/2.8b67ffc6.chunk.js",
     "static/css/main.938e90dd.chunk.css",
-    "static/js/main.cf7580b5.chunk.js"
+    "static/js/main.dcbadb98.chunk.js"
   ]
 }
